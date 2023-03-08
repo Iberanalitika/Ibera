@@ -11,10 +11,10 @@
 #' finance_reconcile_sums()
 #' finance_reconcile_sums(c(5, 10, 15, 20, 25))
 
-
-
-
 finance_reconcile_sums <- function(amounts = c(10, 20, 30, 40, 50)){
+
+
+
 
   # Sample input data frame
   transactions <- data.frame( ids = c(1:length(amounts)),
@@ -30,12 +30,11 @@ finance_reconcile_sums <- function(amounts = c(10, 20, 30, 40, 50)){
       for (j in i:nrow(transactions)) {
         for (z in j:nrow(transactions)) {
           for (w in z:nrow(transactions)) {
-            # Check that the ids are unique
-              # Calculate the sum of the amounts for this combination
-              sum_amount <- sum(transactions$amount[unique(c(i:j,z:w))])
-              # Add the sum and the corresponding ids to the output list
-              output[[length(output) + 1]] <- c(sum_amount, paste(transactions$id[unique(c(i:j,z:w))], collapse = "-"))
+            # Calculate the sum of the amounts for this combination
+            sum_amount <- sum(transactions$amount[c(i:j,z:w)])
 
+            # Add the sum and the corresponding ids to the output list
+            output[[length(output) + 1]] <- c(sum_amount, paste(transactions$id[c(i:j,z:w)], collapse = "-"))
           }
         }
       }
@@ -48,7 +47,8 @@ finance_reconcile_sums <- function(amounts = c(10, 20, 30, 40, 50)){
   }
 
   # Call the function with the input data frame
-  output <- unique(generate_sum_combinations(transactions))
+  output <- generate_sum_combinations(transactions)
 
   return(output)
+
 }
