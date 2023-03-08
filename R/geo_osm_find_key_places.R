@@ -1,6 +1,6 @@
 
 
-osm_find_key_places <- function(key_word = "school hungary", zoom = 20){
+geo_osm_find_key_places <- function(key_word = "school hungary", zoom = 20){
 
 
 

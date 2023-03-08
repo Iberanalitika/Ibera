@@ -1,5 +1,5 @@
 
-duckduckgo_locations <- function(text = "FREE UNIVERSITY BRUSSELS") {
+geo_duckduckgo_locations <- function(text = "FREE UNIVERSITY BRUSSELS") {
 
 text <- gsub(pattern = " ", "%20",text)
 

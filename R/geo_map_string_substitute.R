@@ -1,5 +1,5 @@
 
-map_string_substitute <- function(words = c("D<dc>SSELDORF", "LI<c8>GE", "Z<dc>RICH"), map = data.frame(
+geo_map_string_substitute <- function(words = c("D<dc>SSELDORF", "LI<c8>GE", "Z<dc>RICH"), map = data.frame(
   from = c("<c7>", "<e7>", "<c8>", "<e8>", "<c9>", "<e9>", "<ca>", "<ea>", "<cb>", "<eb>", "<ce>", "<ee>", "<cf>", "<ef>", "<d4>", "<f4>", "<d9>", "<f9>", "<db>", "<fb>", "\xc5"),
   to = c("Ç", "ç", "È", "è", "É", "é", "Ê", "ê", "Ë", "ë", "Î", "î", "Ï", "ï", "Ô", "ô", "Ù", "ù", "Û", "û", "A")
 )) {

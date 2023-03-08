@@ -1,5 +1,5 @@
 
-waze_locations <- function(text = "Restaurant") {
+geo_waze_locations <- function(text = "Restaurant") {
 
   require(httr)
   require(jsonlite)
