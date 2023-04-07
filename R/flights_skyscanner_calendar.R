@@ -1,5 +1,5 @@
 
-flights_skyscanner_calendar <- function() {
+flights_skyscanner_calendar <- function( origin = "BRU", destination = "VLC")  {
 
 
 
@@ -52,8 +52,8 @@ headers = c(
 
 params = list(
   `apiKey` = "8deb9738278e43399a54c6e73d9bb893",
-  `destinationRelevantFlightSkyId` = "VLC",
-  `originRelevantFlightSkyId` = "BRU"
+  `destinationRelevantFlightSkyId` = origin,
+  `originRelevantFlightSkyId` = destination
 )
 
 res <- httr::GET(url = "https://www.skyscanner.net/g/fenryr/v1/pricecalendar", httr::add_headers(.headers=headers), query = params, httr::set_cookies(.cookies = cookies))
