@@ -1,0 +1,152 @@
+
+
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(lubridate)
+
+library(googlesheets4)
+gs4_auth(email = "iberanalitika@gmail.com")
+
+
+# Casa Accademia -----
+
+require(httr)
+
+cookies = c(
+  `cookie_data_ui_elem_page_dash_it_4` = "0fe7147ca04b1d40a8f029d8b17b936043df7e42",
+  `cookie_data_ui_elem_page_planner_it_4` = "c53b9bbe06a17fa50c9038dafabd6d3cf671bd86",
+  `cookie_data_namespace_payments_it_4` = "a785f59f81a28943f292d4465ce54f7b3a07f087",
+  `cookie_data_ui_elem_page_tabla_it_4` = "f697598cdd78228c362636a201060cb32fcb9013",
+  `cookie_data_ui_elem_page_finance_payments_it_4` = "d11fcf509fc1792fef1320cedad88d33c74d7e93",
+  `cookie_data_ui_elem_components_it_4` = "5b3c7df69efe490cadd1d3cab8b5360cae263428",
+  `cookie_data_ui_elem_page_youbook_it_4` = "fb819dec69bbd5dbc5bc5c7c096a95abef18c85d",
+  `cookie_data_ui_elem_page_zview_it_4` = "bb8de76659593bbaf6b55a66b7ab22ca8850a365",
+  `cookie_data_ui_elem_page_rsrv_details_it_4` = "e9d7ed67aeabc0892d1ed14b15d90ac568884646",
+  `cookie_data_jrev_client_info_4` = "cdfe168af36c3d34c37d8cf8a87c5e75c635bd92",
+  `cookie_data_zpdata_6732_4` = "7d272ce4cbe97b762f605e05ea3bfe973dc99c4e",
+  `cookie_data_zpdata_6731_4` = "55742940a59bfb7b5d0a135dadae0585aaabfb37",
+  `cookie_data_ui_elem_frame_it_4` = "bcd76ca21af99c932f1025a2f641877219c90a4a",
+  `cookie_data_ui_elem_page_report_it_4` = "6a733726b6fcf0eea60960fa6cf3bd513cbc9045",
+  `ksc` = "0d31feec5a37e5deb31642f29d509073",
+  `_ga` = "GA1.2.745958791.1608804356",
+  `weuc_wubook` = '{"_":1}',
+  `_fbp` = "fb.1.1675248789975.1544911369",
+  `_ym_uid` = "1616163245601480774",
+  `_ym_d` = "1675248790"
+)
+
+headers = c(
+  `authority` = "wubook.net",
+  `accept` = "*/*",
+  `accept-language` = "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7",
+  `content-type` = "application/x-www-form-urlencoded; charset=UTF-8",
+  `origin` = "https://wubook.net",
+  `referer` = "https://wubook.net/zks/rsrvs/zplan/",
+  `sec-ch-ua` = '"Chromium";v="110", "Not A(Brand";v="24", "Google Chrome";v="110"',
+  `sec-ch-ua-mobile` = "?0",
+  `sec-ch-ua-platform` = '"Windows"',
+  `sec-fetch-dest` = "empty",
+  `sec-fetch-mode` = "cors",
+  `sec-fetch-site` = "same-origin",
+  `user-agent` = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
+  `x-requested-with` = "XMLHttpRequest"
+)
+
+data = list(
+  `_kscs_` = "",
+  `__zpid__` = "6732",
+  `dfrom` = "01/01/2023",
+  `dto` = "31/12/2023"
+)
+
+res <- httr::POST(url = "https://wubook.net/zks/rsrvs/zplan/bsetup/report", httr::add_headers(.headers=headers), httr::set_cookies(.cookies = cookies), body = data, encode = "form")
+
+
+dat <- content(res, as = "text",encoding = "UTF-8" )
+
+
+
+
+dat <- jsonlite::fromJSON(dat)
+
+
+Data <- dat$bdays
+
+
+
+
+## Room ID ----
+
+
+headers = c(
+  `x-api-key` = 'wb_fe68a2f4-fb28-11ea-a821-001a4a5c09cf'
+)
+
+res <- httr::GET(url = "https://kapi.wubook.net/kp/property/fetch_rooms", httr::add_headers(.headers=headers))
+
+
+dat <- content(res, as = "text",encoding = "UTF-8" )
+
+
+RoomData <- jsonlite::fromJSON(dat)
+
+RoomData <- RoomData$data
+
+RoomData <- select(RoomData, c(id, name))
+names(RoomData) <- c("id_zak_room","name")
+RoomData <- separate(data = RoomData,col =  "name", into =  c("Type","RmNumber"),sep = "-")
+
+
+DB <- left_join(Data, RoomData, by = "id_zak_room")
+DB$executed <- lubridate::as_datetime(DB$executed)
+DB$scheduled <- lubridate::as_datetime(DB$scheduled)
+
+## Room setup ----
+
+RmSetup <- data.frame(
+   stringsAsFactors = FALSE,
+  id_zak_room_setup = c(0L,5391L,5602L,5891L,
+                        7347L,7348L,7349L,7350L,7351L,7352L,55020L),
+    Room_Setup_Name = c("No Setup",
+                        "Due Letti  Singoli (Twin)","Letto Singolo (Singola)",
+                        "Letto Matrimoniale (Doppia)",
+                        "Letto Matrimoniale + Letto Singolo (Doppia)","3 Letti Singoli (Tripla Letti Separati)",
+                        "Letto Singolo + Letto A Castello (Tripla Con Letto A Castello)",
+                        "Letto Matrimoniale + Letto Matimoniale (Quadrupla)",
+                        "Letto Matrimoniale + 2 Letti Singoli (Quadrupla Letti Separati)",
+                        "Matrimoniale + Letto A Castello (Quadrupla Con Letto A Castello)","4 Single Beds (Quadrupla)")
+)
+
+
+
+DB <- left_join(DB, RmSetup, by = "id_zak_room_setup")
+
+
+## Cleaning mode `cmode` ----
+
+
+RmCmode <- data.frame(
+   stringsAsFactors = FALSE,
+              cmode = c(0L, 1L, 2L, 3L),
+  CleaningMode_Name = c("Not to clean",
+                        "Fast Cleaning","Normal Cleaning","Deep Cleaning")
+)
+
+
+DB <- left_join(DB, RmCmode, by = "cmode")
+
+
+## Cleaning Changes ----
+
+
+RMChanges <- data.table::data.table(
+       changes = c(0L, 1L, 2L, 3L),
+               Changes_Name = c("No",
+                                "Lenzuola","Asciugamani","Lenzuola + Asciugamani")
+             )
+
+DB <- left_join(DB, RMChanges, by = "changes")
+DB$ExtratctionDate <- Sys.Date()
+
+googlesheets4::write_sheet(data = DB,ss = "https://docs.google.com/spreadsheets/d/1RCHS7WIKG2Nbs5TuXESP2tSIXW3rEEaUulTmoRPoo0I/edit?usp=sharing",sheet = "RawData")
