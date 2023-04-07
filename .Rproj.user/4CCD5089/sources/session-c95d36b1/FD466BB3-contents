@@ -1,1 +1,13 @@
-ibeRa::flights_skyscanner_calendar()
+library(dplyr)
+
+
+BRUVLC <- ibeRa::flights_skyscanner_calendar(origin = "BRU", destination = "VLC")
+names(BRUVLC) <- c("Date", "BV_Rate", "BV_Price")
+
+VLCBRU <- ibeRa::flights_skyscanner_calendar(origin = "VLC", destination = "BRU")
+names(VLCBRU) <- c("Date", "VB_Rate", "VB_Price")
+
+test <- full_join(BRUVLC, VLCBRU, by = "Date")
+
+
+test$check <- test$BV_Price == test$VB_Price
